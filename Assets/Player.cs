@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class Player : MonoBehaviour
@@ -5,6 +6,8 @@ public class Player : MonoBehaviour
 
     // publicとすると、Inspectorで値を変更できる。
     // 公開する理由がない限りはprivateで調整できなくしておくのが基本（誤った調整操作を防ぐ）
+
+    private Animator anim;
     private Rigidbody2D rb;
     [SerializeField] private float moveSpeed = 3.5f;
     [SerializeField] private float jumpForce = 8;
@@ -14,14 +17,25 @@ public class Player : MonoBehaviour
     {
         // script状に存在するRigidbody2Dコンポーネントを割り当てる
         rb = GetComponent<Rigidbody2D>();
+        anim = GetComponentInChildren<Animator>();
     }
 
     private void Update()
     {
         HandleInput();
         HandleMovement();
+        HandleAnimations();
 
     }
+
+    private void HandleAnimations()
+    {
+        bool isMoving = rb.linearVelocity.x != 0;
+
+        anim.SetBool("isMoving", isMoving);
+
+    }
+
 
     private void HandleInput()
     {
