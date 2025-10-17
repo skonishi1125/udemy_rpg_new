@@ -5,10 +5,23 @@ public class Player : MonoBehaviour
 
     // publicとすると、Inspectorで値を変更できる。
     // 公開する理由がない限りはprivateで調整できなくしておくのが基本（誤った調整操作を防ぐ）
-
-    [Header ("Movement details")]
     private Animator anim;
     private Rigidbody2D rb;
+
+    // set size, when you create array
+    // そこまでFlexibleでないということ。 処理が比較的早く、固定スロットの要素に使うとよい。
+    // スキルが4枠割り当てられる仕様で、それが固定なら[] Arrayを使う
+    [Header("Attack details")]
+    [SerializeField] private float attackRadius;
+    [SerializeField] private Transform attackPoint;
+    [SerializeField] private LayerMask whatIsEnemy;
+
+    // can have dynamic size 処理が比較的遅め
+    // アイテムイベントリなど、状況によって変動するものをセットする場合こちらを使うとよい
+    //public List<Collider2D> exampleList; 
+
+
+    [Header("Movement details")]
     [SerializeField] private float moveSpeed = 3.5f;
     [SerializeField] private float jumpForce = 8;
     private float xInput;
@@ -16,7 +29,7 @@ public class Player : MonoBehaviour
     private bool canMove = true;
     private bool canJump = true;
 
-    [Header ("Collision details")]
+    [Header("Collision details")]
     [SerializeField] private float groundCheckDistance;
     [SerializeField] private LayerMask whatIsGround;
     private bool isGrounded;
@@ -35,6 +48,17 @@ public class Player : MonoBehaviour
         HandleMovement();
         HandleAnimations();
         HandleFlip();
+    }
+
+    public void DamageEnemies()
+    {
+        Collider2D[] enemyColliders;
+        enemyColliders = Physics2D.OverlapCircleAll(attackPoint.position, attackRadius, whatIsEnemy);
+
+        foreach (Collider2D enemy in enemyColliders)
+        {
+            enemy.GetComponent<Enemy>().TakeDamage();
+        }
     }
 
     public void EnableMovementAndJump(bool enable)
@@ -115,7 +139,7 @@ public class Player : MonoBehaviour
     private void OnDrawGizmos()
     {
         // エディタ上でのみ描画するための設定
-        // 
         Gizmos.DrawLine(transform.position, transform.position + new Vector3(0, -groundCheckDistance));
+        Gizmos.DrawWireSphere(attackPoint.position, attackRadius);
     }
 }
