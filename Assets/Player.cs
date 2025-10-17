@@ -13,6 +13,8 @@ public class Player : MonoBehaviour
     [SerializeField] private float jumpForce = 8;
     private float xInput;
     private bool facingRight = true;
+    private bool canMove = true;
+    private bool canJump = true;
 
     [Header ("Collision details")]
     [SerializeField] private float groundCheckDistance;
@@ -33,7 +35,12 @@ public class Player : MonoBehaviour
         HandleMovement();
         HandleAnimations();
         HandleFlip();
+    }
 
+    public void EnableMovementAndJump(bool enable)
+    {
+        canMove = enable;
+        canJump = enable;
     }
 
     private void HandleAnimations()
@@ -51,24 +58,37 @@ public class Player : MonoBehaviour
 
         // GetKey: 押している間 ...Down: 押した瞬間 ...Up: 離した瞬間
         if (Input.GetKeyDown(KeyCode.Space))
-            Jump();
+            TryToJump();
 
+        if (Input.GetKeyDown(KeyCode.Mouse0))
+            TryToAttack();
+
+    }
+
+    private void TryToAttack()
+    {
+        if (isGrounded)
+            anim.SetTrigger("attack");
+    }
+
+    private void TryToJump()
+    {
+        Debug.Log("Someone pressed Jump() key");
+        if (isGrounded && canJump)
+        {
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
+        }
     }
 
     private void HandleMovement()
     {
         // -1 or +1 にするだけなので、Updateでやってしまって構わない。
-        rb.linearVelocity = new Vector2(xInput * moveSpeed, rb.linearVelocity.y); // 2次元ベクトル: Vector2
+        if (canMove == true)
+            rb.linearVelocity = new Vector2(xInput * moveSpeed, rb.linearVelocity.y); // 2次元ベクトル: Vector2
+        else
+            rb.linearVelocity = new Vector2(0, rb.linearVelocity.y); // canMoveがfalse(攻撃中)の間は横移動を0にする
     }
 
-    private void Jump()
-    {
-        Debug.Log("Someone pressed Jump() key");
-        if (isGrounded) 
-        {
-            rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
-        }
-    }
 
     private void HandleCollision()
     {
