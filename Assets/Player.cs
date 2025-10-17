@@ -6,13 +6,18 @@ public class Player : MonoBehaviour
     // publicとすると、Inspectorで値を変更できる。
     // 公開する理由がない限りはprivateで調整できなくしておくのが基本（誤った調整操作を防ぐ）
 
+    [Header ("Movement details")]
     private Animator anim;
     private Rigidbody2D rb;
     [SerializeField] private float moveSpeed = 3.5f;
     [SerializeField] private float jumpForce = 8;
     private float xInput;
+    private bool facingRight = true;
 
-    [SerializeField] private bool facingRight = true;
+    [Header ("Collision details")]
+    [SerializeField] private float groundCheckDistance;
+    [SerializeField] private LayerMask whatIsGround;
+    private bool isGrounded;
 
     private void Awake()
     {
@@ -23,6 +28,7 @@ public class Player : MonoBehaviour
 
     private void Update()
     {
+        HandleCollision();
         HandleInput();
         HandleMovement();
         HandleAnimations();
@@ -50,7 +56,6 @@ public class Player : MonoBehaviour
 
     }
 
-
     private void HandleMovement()
     {
         // -1 or +1 にするだけなので、Updateでやってしまって構わない。
@@ -60,7 +65,15 @@ public class Player : MonoBehaviour
     private void Jump()
     {
         Debug.Log("Someone pressed Jump() key");
-        rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
+        if (isGrounded) 
+        {
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
+        }
+    }
+
+    private void HandleCollision()
+    {
+        isGrounded = Physics2D.Raycast(transform.position, Vector2.down, groundCheckDistance, whatIsGround);
     }
 
     private void HandleFlip()
@@ -80,4 +93,10 @@ public class Player : MonoBehaviour
         facingRight = !facingRight; // 呼ばれるたび反転させる
     }
 
+    private void OnDrawGizmos()
+    {
+        // エディタ上でのみ描画するための設定
+        // 
+        Gizmos.DrawLine(transform.position, transform.position + new Vector3(0, -groundCheckDistance));
+    }
 }
