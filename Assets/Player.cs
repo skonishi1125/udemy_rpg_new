@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 public class Player : MonoBehaviour
@@ -13,6 +12,8 @@ public class Player : MonoBehaviour
     [SerializeField] private float jumpForce = 8;
     private float xInput;
 
+    [SerializeField] private bool facingRight = true;
+
     private void Awake()
     {
         // script状に存在するRigidbody2Dコンポーネントを割り当てる
@@ -25,6 +26,7 @@ public class Player : MonoBehaviour
         HandleInput();
         HandleMovement();
         HandleAnimations();
+        HandleFlip();
 
     }
 
@@ -60,4 +62,22 @@ public class Player : MonoBehaviour
         Debug.Log("Someone pressed Jump() key");
         rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
     }
+
+    private void HandleFlip()
+    {
+        // linearVelocity.x: 右移動時は+, 左移動時は-
+        // 右に移動しており, 右を向いていない場合は反転
+        if (rb.linearVelocity.x > 0 && facingRight == false)
+            Flip();
+        else if (rb.linearVelocity.x < 0 && facingRight == true)
+            Flip();
+    }
+
+    [ContextMenu("Flip")] // Inspectorのコンテキストメニューから呼び出せるようにできる
+    private void Flip()
+    {
+        transform.Rotate(0, 180, 0);
+        facingRight = !facingRight; // 呼ばれるたび反転させる
+    }
+
 }
