@@ -57,7 +57,11 @@ public class Player : MonoBehaviour
 
         foreach (Collider2D enemy in enemyColliders)
         {
-            enemy.GetComponent<Enemy>().TakeDamage();
+            Enemy enemyScript = enemy.GetComponent<Enemy>();
+            enemyScript.TakeDamage();
+
+            string enemyName = enemyScript.GetEnemyName();
+            Debug.Log("I damaged enemy : " + enemyName);
         }
     }
 

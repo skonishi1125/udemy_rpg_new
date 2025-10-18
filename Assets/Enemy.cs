@@ -3,12 +3,12 @@ using UnityEngine;
 public class Enemy : MonoBehaviour
 {
 
-    [SerializeField] protected float moveSpeed;
     [SerializeField] protected string enemyName;
+    [SerializeField] protected float moveSpeed;
 
     private void Update()
     {
-        moveAround();
+        //moveAround();
 
         if (Input.GetKeyDown(KeyCode.F))
             Attack();
@@ -29,6 +29,11 @@ public class Enemy : MonoBehaviour
     public void TakeDamage()
     {
 
+    }
+
+    public string GetEnemyName()
+    {
+        return enemyName;
     }
 
 }
